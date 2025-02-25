@@ -1,4 +1,4 @@
-// apiService.ts
+// apiService.ts - Updated to use Express API Gateway
 import axios from "axios";
 import {
   Product,
@@ -9,7 +9,8 @@ import {
   PriceDetailFormData,
 } from "@/type/type";
 
-const API_BASE_URL = "http://localhost:8000/api/v1";
+// Ganti ini dengan URL Express API Gateway
+const API_BASE_URL = "http://localhost:5002/api";
 
 // Product Service
 export const productService = {
@@ -54,7 +55,7 @@ export const productService = {
     product_category?: string;
     tier?: string;
   }): Promise<Product[]> => {
-    const response = await axios.get(`${API_BASE_URL}/products/search/query`, {
+    const response = await axios.get(`${API_BASE_URL}/products/search`, {
       params,
     });
     return response.data;
@@ -138,3 +139,18 @@ export const priceDetailService = {
     await axios.delete(`${API_BASE_URL}/price-details/${id}`);
   },
 };
+
+// Add extended types to use formatted values from Express middleware
+export interface ExtendedPriceDetail extends PriceDetail {
+  formatted_price?: string;
+}
+
+export interface ExtendedPrice extends Price {
+  lowest_price?: number;
+  highest_price?: number;
+  price_details: ExtendedPriceDetail[];
+}
+
+export interface ExtendedProduct extends Product {
+  prices: ExtendedPrice[];
+}
